@@ -1,1 +1,158 @@
+#include <stdio.h>
+#include <stdlib.h>
 
+struct DoublyNode {
+    int data;
+    struct DoublyNode* prev;
+    struct DoublyNode* next;
+};
+
+// Insert a new node at the beginning of the list
+void insertAtBeginning(struct DoublyNode** head, int data) {
+    struct DoublyNode* newNode = (struct DoublyNode*)malloc(sizeof(struct DoublyNode));
+    if (newNode == NULL) {
+        printf("Memory allocation error\n");
+        return;
+    }
+
+    newNode->data = data;
+    newNode->prev = NULL;
+    newNode->next = *head;
+
+    if (*head != NULL) {
+        (*head)->prev = newNode;
+    }
+    *head = newNode;
+}
+
+// Insert a new node at the end of the list
+void insertAtEnd(struct DoublyNode** head, int data) {
+    struct DoublyNode* newNode = (struct DoublyNode*)malloc(sizeof(struct DoublyNode));
+    if (newNode == NULL) {
+        printf("Memory allocation error\n");
+        return;
+    }
+
+    newNode->data = data;
+    newNode->next = NULL;
+
+    if (*head == NULL) {
+        newNode->prev = NULL;
+        *head = newNode;
+        return;
+    }
+
+    struct DoublyNode* temp = *head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+
+    temp->next = newNode;
+    newNode->prev = temp;
+}
+
+// Insert a new node after a given node
+void insertAfter(struct DoublyNode* prevNode, int data) {
+    if (prevNode == NULL) {
+        printf("Previous node cannot be NULL\n");
+        return;
+    }
+
+    struct DoublyNode* newNode = (struct DoublyNode*)malloc(sizeof(struct DoublyNode));
+    if (newNode == NULL) {
+        printf("Memory allocation error\n");
+        return;
+    }
+
+    newNode->data = data;
+    newNode->next = prevNode->next;
+    prevNode->next = newNode;
+    newNode->prev = prevNode;
+
+    if (newNode->next != NULL) {
+        newNode->next->prev = newNode;
+    }
+}
+
+// Delete the first node
+void deleteFirst(struct DoublyNode** head) {
+    if (*head == NULL) return;
+
+    struct DoublyNode* temp = *head;
+    *head = temp->next;
+
+    if (*head != NULL) {
+        (*head)->prev = NULL;
+    }
+
+    free(temp);
+}
+
+// Delete the last node
+void deleteLast(struct DoublyNode** head) {
+    if (*head == NULL) return;
+
+    struct DoublyNode* temp = *head;
+
+    // If there is only one node in the list
+    if (temp->next == NULL) {
+        free(temp);
+        *head = NULL;
+        return;
+    }
+
+    // Traverse to the last node
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+
+    temp->prev->next = NULL;
+    free(temp);
+}
+
+// Delete the node after a given node
+void deleteAfter(struct DoublyNode* prevNode) {
+    if (prevNode == NULL || prevNode->next == NULL) return;
+
+    struct DoublyNode* temp = prevNode->next;
+    prevNode->next = temp->next;
+
+    if (temp->next != NULL) {
+        temp->next->prev = prevNode;
+    }
+
+    free(temp);
+}
+
+// Traverse and print all nodes in the list
+void traverseList(struct DoublyNode* head) {
+    struct DoublyNode* temp = head;
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// Main function
+int main() {
+    struct DoublyNode* doublyList = NULL;
+
+    insertAtBeginning(&doublyList, 10);
+    insertAtEnd(&doublyList, 20);
+    insertAtEnd(&doublyList, 30);
+    insertAfter(doublyList, 15);
+
+    printf("List after insertions: ");
+    traverseList(doublyList);
+
+    deleteFirst(&doublyList);
+    printf("List after deleting the first node: ");
+    traverseList(doublyList);
+
+    deleteLast(&doublyList);
+    printf("List after deleting the last node: ");
+    traverseList(doublyList);
+
+    return 0;
+}
